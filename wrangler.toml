@@ -1,0 +1,21 @@
+name = "fixtiktok"
+type = "javascript"
+zone_id = "bf1983e5a2642d20f29c6ef54e5a8889"
+account_id = "f2ced4fc0f5c1d9838ecc08a0d15bdb4"
+compatibility_date = "2022-01-04"
+routes = ["dev.fixtiktok.com/*"]
+
+[build]
+command = "yarn && yarn build"
+[build.upload]
+format = "service-worker"
+
+[dev]
+port = 8080
+
+[vars]
+base_url = "https://fixtiktok.com"
+
+[env.production]
+vars = { base_url = "https://fixtiktok.com" }
+routes = ["fixtiktok.com/*", "www.fixtiktok.com/*"]
