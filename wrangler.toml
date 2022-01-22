@@ -3,7 +3,8 @@ type = "javascript"
 zone_id = "bf1983e5a2642d20f29c6ef54e5a8889"
 account_id = "f2ced4fc0f5c1d9838ecc08a0d15bdb4"
 compatibility_date = "2022-01-04"
-routes = ["dev.fixtiktok.com/*"]
+routes = ["fixtiktok.com/*"]
+workers_dev = true
 
 [build]
 command = "yarn && yarn build"
