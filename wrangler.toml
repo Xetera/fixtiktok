@@ -3,7 +3,7 @@ type = "javascript"
 zone_id = "bf1983e5a2642d20f29c6ef54e5a8889"
 account_id = "f2ced4fc0f5c1d9838ecc08a0d15bdb4"
 compatibility_date = "2022-01-04"
-routes = ["fixtiktok.com/*"]
+routes = ["fixtiktok.com/*", "vm.fixtiktok.com/*"]
 workers_dev = true
 
 [build]
@@ -19,4 +19,4 @@ base_url = "https://fixtiktok.com"
 
 [env.production]
 vars = { base_url = "https://fixtiktok.com" }
-routes = ["fixtiktok.com/*", "www.fixtiktok.com/*"]
+routes = ["fixtiktok.com/*", "www.fixtiktok.com/*", "vm.fixtiktok.com/*"]

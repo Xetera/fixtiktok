@@ -67,6 +67,7 @@ router.get("/_video/*", async (req) => {
 })
 
 const followShortenedLink = async (url: URL): Promise<string> => {
+  console.log(`Following a short url!`)
   const redirectedUrl = `https://vm.tiktok.com${url.pathname}`
   console.log(redirectedUrl)
   const res = await fetch(redirectedUrl, {
@@ -83,7 +84,6 @@ const followShortenedLink = async (url: URL): Promise<string> => {
     method: "HEAD",
     redirect: "manual",
   })
-  console.log(Object.entries(res2.headers.entries()))
   const lastStop = res2.headers.get("location")
   if (!lastStop) {
     throw Error("Invalid redirect response")
@@ -96,7 +96,10 @@ const headers = {
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
 }
 
-function extractSigi(doc: HTMLElement): HTMLOptions | undefined {
+function extractSigi(
+  doc: HTMLElement,
+  targetUrl: string,
+): HTMLOptions | undefined {
   console.log(`Extracting SIGI site data`)
   const element = doc.querySelector("#sigi-persisted-data")
   if (!element) {
@@ -106,21 +109,18 @@ function extractSigi(doc: HTMLElement): HTMLOptions | undefined {
     .replace(/^window\['SIGI_STATE'\]=/, "")
     .replace(/;window\['SIGI_RETRY'\].*$/, "")
   const data = JSON.parse(jsonString)
-  console.log(JSON.stringify(data, null, 2))
   const title = data.SEO.metaParams.title
   const item: any = Object.values(data.ItemModule)[0]
   if (!item) {
-    console.log("what the fucl?")
+    console.log(`Got an ItemModule without any elements?`)
     return
   }
   const videoUrl = item.video.downloadAddr
-  console.log(title)
-  console.log(data.SEO.metaParams)
   return {
     title,
     authorName: item.nickname,
     videoUrl,
-    targetUrl: "",
+    targetUrl,
   }
 }
 /*
@@ -129,10 +129,10 @@ Our index route, a simple hello world.
 router.get("*", async (req) => {
   console.log("requesting page")
   const selfUrl = new URL(req.url)
-  const url = selfUrl
   console.log(selfUrl.toString())
   const path = selfUrl.pathname
-  const isShortenedLink = url.hostname.startsWith("vm.")
+  const isShortenedLink = selfUrl.hostname.startsWith("vm.")
+  console.log(`Request ${isShortenedLink ? "is" : "is not"} a short url`)
   let targetUrl = isShortenedLink
     ? await followShortenedLink(selfUrl)
     : `https://www.tiktok.com${path}`
@@ -158,7 +158,7 @@ router.get("*", async (req) => {
   const script = parsed.querySelector("script[id='__NEXT_DATA__']")
   let output: HTMLOptions | undefined
   if (!script) {
-    output = extractSigi(parsed)
+    output = extractSigi(parsed, targetUrl)
   }
   if (script) {
     const jsonLike = script!.innerText
