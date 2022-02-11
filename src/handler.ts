@@ -72,23 +72,16 @@ const followShortenedLink = async (url: URL): Promise<string> => {
   console.log(redirectedUrl)
   const res = await fetch(redirectedUrl, {
     headers,
-    method: "HEAD",
+    method: "GET",
     redirect: "manual",
   })
   const newRedirect = res.headers.get("location")
   if (!newRedirect) {
+    console.log(await res.text())
+    console.log(Object.fromEntries(res.headers.entries()))
     throw Error("Invalid redirect response")
   }
-  const res2 = await fetch(newRedirect, {
-    headers,
-    method: "HEAD",
-    redirect: "manual",
-  })
-  const lastStop = res2.headers.get("location")
-  if (!lastStop) {
-    throw Error("Invalid redirect response")
-  }
-  return lastStop
+  return newRedirect
 }
 
 const headers = {
@@ -149,9 +142,10 @@ router.get("*", async (req) => {
   // return new Response(JSON.stringify(Object.fromEntries(res.headers.entries())))
   // }
 
-  // if (!path.startsWith('/@') && !isShortenedLink) {
-  //   return Response.redirect('https://github.com/Xetera/fixtiktok')
-  // }
+  if (!path.startsWith("/@") && !isShortenedLink) {
+    return Response.redirect("https://github.com/Xetera/fixtiktok")
+  }
+
   const result = await fetch(targetUrl, { headers })
   const html = await result.text()
   const parsed = parser(html)
